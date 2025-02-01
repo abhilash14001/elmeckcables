@@ -104,7 +104,7 @@ const RedeemQr = () => {
     const [selectedUser, setSelectedUser] = useState([])
     const [totalRecords, setTotalRecords] = useState(0)
 
-    useEffect(() => {
+    useEffect( () => {
         offset.current = 0
         q.current = {
             role: id,
@@ -112,8 +112,9 @@ const RedeemQr = () => {
         }
         setSelectedUser([])
         setCurrentPage(1)
-        getRedeemList()
+
         getUserList()
+
     }, [id])
 
     const getRedeemList = () => {
@@ -122,6 +123,8 @@ const RedeemQr = () => {
 
     const listRedeem = (newS) => {
         setLoader(true)
+
+
         api.Redeem.listRedeem({
             q: q.current,
             o: offset.current,
@@ -131,7 +134,10 @@ const RedeemQr = () => {
                 setRedeemList(response.data.data.records)
                 setpageCount(Math.ceil(response.data.data.totalRecords / limit))
                 setTotalRecords(response.data.data.totalRecords)
+
                 setLoader(false)
+
+
             })
             .catch((err) => {
                 ErrorHandler(err)
@@ -139,7 +145,9 @@ const RedeemQr = () => {
     }
 
     const getUserList = (newStatus) => {
+
         setLoader(true)
+
         let qc = {
             role: id,
             type: 'QR',
@@ -153,8 +161,12 @@ const RedeemQr = () => {
         // }
         api.Redeem.userName(qc)
             .then((res) => {
+
                 setUserList(res.data.data.records)
                 setLoader(true)
+                getRedeemList()
+
+
             })
             .catch((err) => ErrorHandler(err))
     }
@@ -169,6 +181,7 @@ const RedeemQr = () => {
 
     const updateStatus = () => {
         setLoader(true)
+
         api.Redeem.updateRedeemStatus(patch._id, {
             status: patch.status,
             trans_msg: patch.trans_msg,
@@ -186,6 +199,7 @@ const RedeemQr = () => {
                     SuccessHandler('Updated.')
                 }
                 setLoader(false)
+
             })
             .catch((err) => {
                 ErrorHandler(err)
@@ -202,6 +216,7 @@ const RedeemQr = () => {
     const ErrorHandler = (err) => {
         setSnack(true)
         setLoader(false)
+
         setAlert({
             type: 'error',
             message:
