@@ -1,4 +1,4 @@
-import React, { useEffect, useState, Fragment } from 'react'
+import React, {useEffect, useState, Fragment, useRef} from 'react'
 import { Breadcrumb, SimpleCard } from 'app/components'
 import { styled, Box } from '@mui/system'
 import {
@@ -7,7 +7,7 @@ import {
     TableCell,
     TableBody,
     TableRow,
-    Grid,
+    Grid, TextField, Autocomplete,
 } from '@mui/material'
 import api from '../../../../api'
 import Pagination from '@mui/material/Pagination'
@@ -57,6 +57,9 @@ const ScannedHistory = () => {
     const [loader, setLoader] = React.useState(true)
     const [totalRecords, setTotalRecords] = useState(0)
 
+    const [mobileNumber, setMobileNumber] = useState(null) // Use state instead of useRef
+
+    const mobileNumberRef = useRef(null);
     let { id, userId } = useParams()
 
     useEffect(() => {
@@ -68,18 +71,24 @@ const ScannedHistory = () => {
         getScannedList()
     }, [id])
 
-    const getScannedList = (data) => {
-        setLoader(true)
+    const getScannedList = (data, loader = true) => {
+        if(!loader){
+         setLoader(true)
+        }
         var query = { role: id }
 
         if (userId) {
             query['user'] = userId
         }
 
+
+
         api.Scanned.listScanned({
             q: query,
             o: data || offset,
             l: limit,
+            m: mobileNumberRef?.current ?? null
+
         })
             .then((response) => {
                 setScannedList(response.data.data.records)
@@ -102,6 +111,7 @@ const ScannedHistory = () => {
             q: { role: id },
             o: skip,
             l: limit,
+            m: mobileNumberRef?.current ?? null
         })
             .then((response) => {
                 setScannedList(response.data.data.records)
@@ -110,7 +120,12 @@ const ScannedHistory = () => {
                 console.log(err)
             })
     }
+    const handleSearchChange = (event) => {
+        setMobileNumber(event.target.value) // Update state on input change
+        mobileNumberRef.current = event.target.value
+        getScannedList(false)
 
+    };
     return (
         <Fragment>
             {loader ? (
@@ -122,9 +137,22 @@ const ScannedHistory = () => {
                     </div>
                     <SimpleCard>
                         <Grid container mb={3}>
-                            <Grid item lg={10} md={9}>
+
+                            <Grid item lg={9} md={9}>
                                 <h3>Total Records : {totalRecords}</h3>
                             </Grid>
+                            <Grid item lg={3} md={4} px={3}>
+                                <TextField
+                                    variant="outlined"
+                                    placeholder="Search User"
+                                    fullWidth
+                                    value={mobileNumber ?? ''}
+                                    onChange={handleSearchChange} // Capture input changes
+
+                                />
+
+                            </Grid>
+
                         </Grid>
                         <StyledTable>
                             <TableHead>
@@ -147,6 +175,7 @@ const ScannedHistory = () => {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
+
                                 {scannedList.map((scan, index) => (
                                     <TableRow key={index}>
                                         <TableCell align="left">
