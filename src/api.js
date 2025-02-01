@@ -1,7 +1,7 @@
 import axios from 'axios';
-
-axios.defaults.baseURL = 'https://backend.elmeckcables.com/'
-// axios.defaults.baseURL = 'http://localhost:30928/'
+//TODO : change it back
+// axios.defaults.baseURL = 'https://backend.elmeckcables.com/'
+axios.defaults.baseURL = 'http://localhost:30928/'
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 axios.defaults.headers.post['Content-Type'] = 'application/json';
 

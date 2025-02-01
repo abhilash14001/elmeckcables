@@ -120,11 +120,18 @@ const ScannedHistory = () => {
                 console.log(err)
             })
     }
-    const handleSearchChange = (event) => {
-        setMobileNumber(event.target.value) // Update state on input change
-        mobileNumberRef.current = event.target.value
+    const handleSearchChange = (value) => {
+        setMobileNumber(value) // Update state on input change
+        mobileNumberRef.current = value
         getScannedList(false)
 
+    };
+
+    const handleInputChange = (event) => {
+        const value = event.target.value;
+        // Use a regex to filter out invalid characters
+        const sanitizedValue = value.replace(/[^+\d]/g, ''); //allow + and numbers only
+        handleSearchChange(sanitizedValue);
     };
     return (
         <Fragment>
@@ -144,10 +151,10 @@ const ScannedHistory = () => {
                             <Grid item lg={3} md={4} px={3}>
                                 <TextField
                                     variant="outlined"
-                                    placeholder="Search User"
+                                    placeholder="Search Mobile Number"
                                     fullWidth
                                     value={mobileNumber ?? ''}
-                                    onChange={handleSearchChange} // Capture input changes
+                                    onChange={handleInputChange} // Capture input changes
 
                                 />
 

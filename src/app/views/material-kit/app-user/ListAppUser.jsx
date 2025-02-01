@@ -17,7 +17,7 @@ import {
     Select,
     FormControl,
     InputLabel,
-    MenuItem,
+    MenuItem, TextField,
 } from '@mui/material'
 import api from '../../../../api'
 import Snackbar from '@mui/material/Snackbar'
@@ -81,6 +81,8 @@ const AppUserList = () => {
     const [loader, setLoader] = useState(true)
     const [filter, setFilter] = useState({
         state: 'All',
+        city : '',
+        name : '',
     })
     const [totalRecords, setTotalRecords] = useState(0)
     const [alert, setAlert] = React.useState({
@@ -98,11 +100,15 @@ const AppUserList = () => {
         getStateList()
         setFilter({
             state: 'All',
+            city : "",
+            name : ""
         })
     }, [id])
 
-    const listUser = (data) => {
+    const listUser = (data, load = true) => {
+        if(load){
         setLoader(true)
+        }
         api.appUser
             .list({
                 q: q,
@@ -225,16 +231,38 @@ const AppUserList = () => {
         })
 
         if (e.target.value.length && e.target.value !== 'All') {
-            q = {
-                ...q,
-                'address.state': e.target.value,
-            }
+          switch (e.target.name) {
+              case 'city' :
+              q = {
+                  ...q,
+                  'address.city': e.target.value,
+
+
+              }
+              break;
+
+              case 'state' :
+                  q = {
+                      ...q,
+                      'address.state': e.target.value,
+                  }
+
+                  break;
+              case 'name' :
+                  q = {
+                      ...q,
+                      'name': e.target.value,
+                  }
+
+          }
+
+
         } else {
             delete q['address']
         }
 
         setCurrentPage(1)
-        listUser(0)
+        listUser(0, false)
     }
 
     const handleDialog = async (event) => {
@@ -261,205 +289,190 @@ const AppUserList = () => {
                         <Breadcrumb routeSegments={[{ name: `${id}` }]} />
                     </div>
                     <SimpleCard>
-                        <Grid container mb={3}>
-                            <Grid item lg={10} md={9}>
+                        <Grid container mb={3} alignItems="center" spacing={1}>
+                            <Grid item lg={8} md={9}>
                                 <h3>Total Records : {totalRecords}</h3>
                             </Grid>
-                            <Grid item lg={2} md={3}>
-                                <FormControl size="small" fullWidth>
-                                    <InputLabel id="state">State</InputLabel>
-                                    <Select
-                                        labelId="state"
-                                        label="State"
-                                        name="state"
-                                        value={filter.state}
-                                        onChange={HandleFilter}
-                                    >
-                                        <MenuItem value={'All'}>All</MenuItem>
-                                        {stateList.map((v, i) => (
-                                            <MenuItem value={v} key={v + i}>
-                                                {v}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
+                            <Grid item lg={4} md={2}>
+                                <Grid container spacing={1} alignItems="center">
+                                    {['Name', 'City', 'State'].map((placeholder, index) => (
+                                        <Grid item xs={12} lg={4} sm={6} key={index}>
+                                            <FormControl size="small" fullWidth>
+
+                                                {index < 2 && (
+                                                    <TextField
+                                                        variant="outlined"
+                                                        placeholder={placeholder}
+                                                        fullWidth
+                                                        name={placeholder.toLowerCase()}
+                                                        size="small"
+                                                        value={filter[placeholder.toLowerCase()]}
+                                                        onChange={HandleFilter}
+                                                    />
+                                                )}
+                                                {index === 2 && (
+
+                                                    <>
+                                                        <InputLabel id="state">State</InputLabel>
+                                                        <Select
+                                                            labelId="state"
+                                                            label="State"
+                                                            name="state"
+                                                            value={filter.state}
+                                                            onChange={HandleFilter}
+                                                        >
+                                                            <MenuItem value={'All'}>All</MenuItem>
+                                                            {stateList.map((v, i) => (
+                                                                <MenuItem value={v} key={v + i}>
+                                                                    {v}
+                                                                </MenuItem>
+                                                            ))}
+                                                        </Select>
+                                                    </>
+                                                )}
+                                            </FormControl>
+
+                                        </Grid>
+                                    ))}
+                                </Grid>
                             </Grid>
                         </Grid>
-                        <StyledTable>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell width="20%">User</TableCell>
-                                    <TableCell width="20%">Address</TableCell>
-                                    <TableCell width="20%">Bank info</TableCell>
-                                    <TableCell width="15%">Upi</TableCell>
-                                    <TableCell width="10%" align="center">
-                                        Points
-                                    </TableCell>
-                                    <TableCell width="10%" align="center">
-                                        Action
-                                    </TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {appUserList.map((au, index) => (
-                                    <TableRow key={au._id}>
-                                        <TableCell>
-                                            {calculateDate(
-                                                au?.last_scanned_qr
-                                            ) ? (
-                                                <>
-                                                    <Chip
-                                                        label={`Inactive since ${new Date(
-                                                            au?.last_scanned_qr
-                                                        ).toDateString()}`}
-                                                        color="warning"
-                                                        size="small"
-                                                    />
-                                                    <br />
-                                                </>
-                                            ) : null}
+                        <Box sx={{ overflowX: 'auto' }}>
+                            <Table sx={{ minWidth: 650 }}>
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell width="20%" sx={{ fontWeight: 'bold' }}>User</TableCell>
+                                        <TableCell width="20%" sx={{ fontWeight: 'bold' }}>Address</TableCell>
+                                        <TableCell width="20%" sx={{ fontWeight: 'bold' }}>Bank info</TableCell>
+                                        <TableCell width="15%" sx={{ fontWeight: 'bold' }}>Upi</TableCell>
+                                        <TableCell width="10%" align="center" sx={{ fontWeight: 'bold' }}>
+                                            Points
+                                        </TableCell>
+                                        <TableCell width="10%" align="center" sx={{ fontWeight: 'bold' }}>
+                                            Action
+                                        </TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {appUserList.map((au, index) => (
+                                        <TableRow key={au._id}>
+                                            <TableCell>
+                                                {calculateDate(au?.last_scanned_qr) ? (
+                                                    <>
+                                                        <Chip
+                                                            label={`Inactive since ${new Date(
+                                                                au?.last_scanned_qr
+                                                            ).toDateString()}`}
+                                                            color="warning"
+                                                            size="small"
+                                                        />
+                                                        <br />
+                                                    </>
+                                                ) : null}
 
-                                            <Tooltip
-                                                title="View Activity"
-                                                placement="top"
-                                            >
-                                                <strong>Name : </strong>
-                                            </Tooltip>
+                                                <Tooltip title="View Activity" placement="top">
+                                                    <strong>Name : </strong>
+                                                </Tooltip>
 
-                                            <Link
-                                                to={`/activity-log/${id}/${au._id}`}
-                                                style={{
-                                                    color: '#0000FF99',
-                                                    cursor: 'pointer',
-                                                    fontWeight: 700,
-                                                }}
-                                            >
-                                                {au?.name}
-                                            </Link>
-                                            <br />
-                                            <strong>Email : </strong>
-                                            {au?.email}
-                                            <br />
-                                            <strong>Mobile : </strong>
-                                            {au?.mobile}
-                                            <br />
-                                            {au?.extra_info?.map(
-                                                (info, value) => (
-                                                    <Fragment
-                                                        key={
-                                                            value + index + 'es'
-                                                        }
-                                                    >
-                                                        <strong>
-                                                            {info?.key} :{' '}
-                                                        </strong>
+                                                <Link
+                                                    to={`/activity-log/${id}/${au._id}`}
+                                                    style={{
+                                                        color: '#0000FF99',
+                                                        cursor: 'pointer',
+                                                        fontWeight: 700,
+                                                    }}
+                                                >
+                                                    {au?.name}
+                                                </Link>
+                                                <br />
+                                                <strong>Email : </strong>
+                                                {au?.email}
+                                                <br />
+                                                <strong>Mobile : </strong>
+                                                {au?.mobile}
+                                                <br />
+                                                {au?.extra_info?.map((info, value) => (
+                                                    <Fragment key={value + index + 'es'}>
+                                                        <strong>{info?.key} : </strong>
                                                         {info?.value}
                                                         <br />
                                                     </Fragment>
-                                                )
-                                            )}
-                                        </TableCell>
+                                                ))}
+                                            </TableCell>
 
-                                        <TableCell>
-                                            <strong>State : </strong>
-                                            {au?.address?.state}
-                                            <br />
-                                            <strong>City : </strong>
-                                            {au?.address?.city}
-                                            <br />
-                                            <strong>Pin code : </strong>
-                                            <Span>{au?.address?.pin_code}</Span>
-                                            <br />
-                                            <strong>Street : </strong>
-                                            {au?.address?.street}
-                                        </TableCell>
+                                            <TableCell>
+                                                <strong>State : </strong>
+                                                {au?.address?.state}
+                                                <br />
+                                                <strong>City : </strong>
+                                                {au?.address?.city}
+                                                <br />
+                                                <strong>Pin code : </strong>
+                                                <Span>{au?.address?.pin_code}</Span>
+                                                <br />
+                                                <strong>Street : </strong>
+                                                {au?.address?.street}
+                                            </TableCell>
 
-                                        <TableCell>
-                                            {au.bank_details.map((ban, i) => (
-                                                <Fragment key={i + 'bank'}>
-                                                    <strong>Name : </strong>
-                                                    {ban.name}
-                                                    <br />
-                                                    <strong>
-                                                        Beneficiary name :{' '}
-                                                    </strong>
-                                                    {ban.beneficiary_name}
-                                                    <br />
-                                                    <strong>
-                                                        Account No. :{' '}
-                                                    </strong>
-                                                    {ban.account_no}
-                                                    <br />
-                                                    <strong>IFSC : </strong>
-                                                    {ban.ifsc}
-                                                    {au.bank_details.length !==
-                                                    i + 1 ? (
-                                                        <Divider
-                                                            style={{
-                                                                margin: '1rem 1rem 1rem 0rem',
-                                                            }}
-                                                        />
-                                                    ) : null}
-                                                </Fragment>
-                                            ))}
-                                        </TableCell>
-
-                                        <TableCell>
-                                            <List>
-                                                {au?.upis?.map((upi, index) => (
-                                                    <Fragment key={upi.id}>
-                                                        <strong>
-                                                            Holder :{' '}
-                                                        </strong>
-                                                        {upi.holder}
+                                            <TableCell>
+                                                {au.bank_details.map((ban, i) => (
+                                                    <Fragment key={i + 'bank'}>
+                                                        <strong>Name : </strong>
+                                                        {ban.name}
                                                         <br />
-                                                        <strong>Id : </strong>
-                                                        {upi.id}
-                                                        {au.upis.length !==
-                                                        index + 1 ? (
-                                                            <Divider
-                                                                style={{
-                                                                    margin: '1rem 0rem 1rem 0rem',
-                                                                }}
-                                                            />
+                                                        <strong>Beneficiary name : </strong>
+                                                        {ban.beneficiary_name}
+                                                        <br />
+                                                        <strong>Account No. : </strong>
+                                                        {ban.account_no}
+                                                        <br />
+                                                        <strong>IFSC : </strong>
+                                                        {ban.ifsc}
+                                                        {au.bank_details.length !== i + 1 ? (
+                                                            <Divider style={{ margin: '1rem 1rem 1rem 0rem' }} />
                                                         ) : null}
                                                     </Fragment>
                                                 ))}
-                                            </List>
-                                        </TableCell>
+                                            </TableCell>
 
-                                        <TableCell align="center">
-                                            {au?.points}
-                                        </TableCell>
-                                        <TableCell align="center">
-                                            {PERMISSION.APP_USER.EDIT ? (
-                                                <Link
-                                                    to={`/app-user/${au._id}`}
-                                                >
-                                                    <IconButton>
-                                                        <Icon color="primary">
-                                                            edit
-                                                        </Icon>
+                                            <TableCell>
+                                                <List>
+                                                    {au?.upis?.map((upi, index) => (
+                                                        <Fragment key={upi.id}>
+                                                            <strong>Holder : </strong>
+                                                            {upi.holder}
+                                                            <br />
+                                                            <strong>Id : </strong>
+                                                            {upi.id}
+                                                            {au.upis.length !== index + 1 ? (
+                                                                <Divider style={{ margin: '1rem 0rem 1rem 0rem' }} />
+                                                            ) : null}
+                                                        </Fragment>
+                                                    ))}
+                                                </List>
+                                            </TableCell>
+
+                                            <TableCell align="center">{au?.points}</TableCell>
+                                            <TableCell align="center">
+                                                {PERMISSION.APP_USER.EDIT ? (
+                                                    <Link to={`/app-user/${au._id}`}>
+                                                        <IconButton>
+                                                            <Icon color="primary">edit</Icon>
+                                                        </IconButton>
+                                                    </Link>
+                                                ) : null}
+
+                                                {PERMISSION.APP_USER.DELETE ? (
+                                                    <IconButton onClick={() => handleDialog(au._id)}>
+                                                        <Icon color="error">delete_forever</Icon>
                                                     </IconButton>
-                                                </Link>
-                                            ) : null}
-
-                                            {PERMISSION.APP_USER.DELETE ? (
-                                                <IconButton
-                                                    onClick={() =>
-                                                        handleDialog(au._id)
-                                                    }
-                                                >
-                                                    <Icon color="error">
-                                                        delete_forever
-                                                    </Icon>
-                                                </IconButton>
-                                            ) : null}
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </StyledTable>
+                                                ) : null}
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </Box>
 
                         <Box my={2} display="flex" justifyContent="center">
                             <Pagination
@@ -474,7 +487,6 @@ const AppUserList = () => {
                             />
                         </Box>
                     </SimpleCard>
-
                     <Snackbar
                         open={snack}
                         autoHideDuration={6000}

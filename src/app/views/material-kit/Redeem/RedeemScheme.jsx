@@ -674,33 +674,9 @@ const RedeemScheme = () => {
                                         sx={{ mt: 2 }}
                                         style={{ paddingTop: '0px' }}
                                     >
-                                        {patch.status === 1 ? (
-                                            <FormControl>
-                                                <FormLabel id="demo-row-radio-buttons-group-label">
-                                                    Transaction method
-                                                </FormLabel>
-                                                <RadioGroup
-                                                    row
-                                                    aria-labelledby="demo-row-radio-buttons-group-label"
-                                                    name="trans_msg"
-                                                    value={patch.trans_msg}
-                                                    onChange={HandleForm}
-                                                >
-                                                    <FormControlLabel
-                                                        value="Bank"
-                                                        control={<Radio />}
-                                                        label="Bank"
-                                                    />
-                                                    <FormControlLabel
-                                                        value="UPI"
-                                                        control={<Radio />}
-                                                        label="UPI"
-                                                    />
-                                                </RadioGroup>
-                                            </FormControl>
-                                        ) : (
+                                        {
                                             <TextField
-                                                label="Decline message"
+                                                label={patch.status === 1 ? "Approve Message" : "Decline Message"}
                                                 type="text"
                                                 name="trans_msg"
                                                 fullWidth
@@ -708,7 +684,7 @@ const RedeemScheme = () => {
                                                 onChange={HandleForm}
                                                 validators={['required']}
                                             />
-                                        )}
+                                        }
                                     </Grid>
                                 </Grid>
 
