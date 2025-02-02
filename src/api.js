@@ -1,7 +1,8 @@
 import axios from 'axios';
 //TODO : change it back
-// axios.defaults.baseURL = 'https://backend.elmeckcables.com/'
-axios.defaults.baseURL = 'http://localhost:30928/'
+ axios.defaults.baseURL = 'https://backend.elmeckcables.com/'
+// axios.defaults.baseURL = 'http://localhost:30928/'
+// axios.defaults.baseURL = 'https://elmeckcables.developingmode.online/'
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 axios.defaults.headers.post['Content-Type'] = 'application/json';
 
@@ -45,16 +46,19 @@ let api = {
         listScheme: (data) => axios.post('panel/scheme/list', data),
         deleteScheme: (data) => axios.delete('panel/scheme/' + data),
         getScheme: (data) => axios.get('panel/scheme/' + data),
-        editScheme: (id, data) => axios.patch('panel/scheme/' + id, data)
+        editScheme: (id, data) => axios.patch('panel/scheme/' + id, data),
+
     },
     Scanned: {
         listScanned: (data) => axios.post('panel/scanned-qr/list', data),
+        count_qr_scan_both : () => axios.get('panel/scanned-qr/count_qr_scan_both'),
     },
     Redeem: {
         listRedeem: (data) => axios.post('panel/redeem/list', data),
         updateRedeemStatus: (id, data) => axios.patch('panel/redeem/' + id, data),
         userName: (data) => axios.get('panel/redeem/user-name', { params: data }),
-        schemeName: (data) => axios.get('panel/redeem/scheme-name', { params: data })
+        schemeName: (data) => axios.get('panel/redeem/scheme-name', { params: data }),
+        count: () => axios.get('panel/redeem/count')
     },
     appRole: {
         roles: () => axios.get('web/config/setting')
@@ -63,6 +67,7 @@ let api = {
         create: (data) => axios.post('panel/app-user', data),
         get: (data) => axios.get('panel/app-user/' + data),
         list: (data) => axios.post('panel/app-user/list', data),
+        count_app_users: () => axios.get('panel/app-user/count_app_users'),
         update: (id, data) => axios.patch('panel/app-user/' + id, data),
         remove: (data) => axios.delete('panel/app-user/' + data),
     },

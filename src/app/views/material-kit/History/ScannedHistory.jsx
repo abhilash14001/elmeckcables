@@ -58,8 +58,10 @@ const ScannedHistory = () => {
     const [totalRecords, setTotalRecords] = useState(0)
 
     const [mobileNumber, setMobileNumber] = useState(null) // Use state instead of useRef
+    const [nameSearch, setNameSearch] = useState(null) // Use state instead of useRef
 
     const mobileNumberRef = useRef(null);
+    const nameSearchRef = useRef(null);
     let { id, userId } = useParams()
 
     useEffect(() => {
@@ -87,7 +89,8 @@ const ScannedHistory = () => {
             q: query,
             o: data || offset,
             l: limit,
-            m: mobileNumberRef?.current ?? null
+            m: mobileNumberRef?.current ?? null,
+            n: nameSearchRef?.current ?? null
 
         })
             .then((response) => {
@@ -111,7 +114,8 @@ const ScannedHistory = () => {
             q: { role: id },
             o: skip,
             l: limit,
-            m: mobileNumberRef?.current ?? null
+            m: mobileNumberRef?.current ?? null,
+            n: nameSearchRef?.current ?? null
         })
             .then((response) => {
                 setScannedList(response.data.data.records)
@@ -120,18 +124,29 @@ const ScannedHistory = () => {
                 console.log(err)
             })
     }
-    const handleSearchChange = (value) => {
+    const handleSearchChange = (value, type = 'mobile') => {
+
+
+        if(type === 'mobile'){
         setMobileNumber(value) // Update state on input change
         mobileNumberRef.current = value
+        }
+        else{
+            setNameSearch(value)
+            nameSearchRef.current = value
+        }
         getScannedList(false)
 
     };
 
-    const handleInputChange = (event) => {
+    const handleInputChange = (event, type = 'mobile') => {
         const value = event.target.value;
+        let sanitizedValue = value;
         // Use a regex to filter out invalid characters
-        const sanitizedValue = value.replace(/[^+\d]/g, ''); //allow + and numbers only
-        handleSearchChange(sanitizedValue);
+        if(type === 'mobile') {
+            sanitizedValue = value.replace(/[^+\d]/g, ''); //allow + and numbers only
+        }
+        handleSearchChange(sanitizedValue, type);
     };
     return (
         <Fragment>
@@ -145,20 +160,28 @@ const ScannedHistory = () => {
                     <SimpleCard>
                         <Grid container mb={3}>
 
-                            <Grid item lg={9} md={9}>
+                            <Grid item lg={8} md={9}>
                                 <h3>Total Records : {totalRecords}</h3>
                             </Grid>
-                            <Grid item lg={3} md={4} px={3}>
+
+                            <Grid item lg={4} md={4} px={3}  sx={{ display: 'flex', gap: 2 }}>
                                 <TextField
                                     variant="outlined"
-                                    placeholder="Search Mobile Number"
+                                    placeholder="Search Mobile"
                                     fullWidth
                                     value={mobileNumber ?? ''}
-                                    onChange={handleInputChange} // Capture input changes
-
+                                    onChange={handleInputChange}
                                 />
-
+                                <TextField
+                                    variant="outlined"
+                                    placeholder="Search Name"
+                                    fullWidth
+                                    value={nameSearch ?? ''}
+                                    onChange={(event) => handleInputChange(event, 'name')}
+                                />
                             </Grid>
+
+
 
                         </Grid>
                         <StyledTable>

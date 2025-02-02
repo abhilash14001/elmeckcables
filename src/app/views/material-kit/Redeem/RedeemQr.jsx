@@ -87,12 +87,13 @@ const RedeemQr = () => {
     const [currentPage, setCurrentPage] = useState(1)
 
     const [snack, setSnack] = useState(false)
-    const [loader, setLoader] = useState(true)
-
     const [alert, setAlert] = React.useState({
         type: 'success',
         message: '',
     })
+    const [loader, setLoader] = useState(true)
+
+
     const [patch, setPatch] = useState({
         _id: '',
         status: -1,

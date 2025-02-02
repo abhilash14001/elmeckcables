@@ -210,7 +210,7 @@ const AppUserList = () => {
 
         const days = Math.ceil(timeDiff / (1000 * 3600 * 24))
 
-        return days > 30 ? true : false
+        return days > 30
     }
 
     const getStateList = () => {
@@ -346,7 +346,10 @@ const AppUserList = () => {
                                         <TableCell width="20%" sx={{ fontWeight: 'bold' }}>Bank info</TableCell>
                                         <TableCell width="15%" sx={{ fontWeight: 'bold' }}>Upi</TableCell>
                                         <TableCell width="10%" align="center" sx={{ fontWeight: 'bold' }}>
-                                            Points
+                                            QR Points
+                                        </TableCell>
+                                        <TableCell width="10%" align="center" sx={{ fontWeight: 'bold' }}>
+                                            Scheme Points
                                         </TableCell>
                                         <TableCell width="10%" align="center" sx={{ fontWeight: 'bold' }}>
                                             Action
@@ -453,6 +456,7 @@ const AppUserList = () => {
                                             </TableCell>
 
                                             <TableCell align="center">{au?.points}</TableCell>
+                                            <TableCell align="center">{au?.redeem_req_points}</TableCell>
                                             <TableCell align="center">
                                                 {PERMISSION.APP_USER.EDIT ? (
                                                     <Link to={`/app-user/${au._id}`}>
